@@ -1,0 +1,307 @@
+package 网吧机房管理系统;
+
+public class Computer {   //电脑类
+ 
+ public static boolean[] computer = new boolean [50];       //电脑
+ public static String[] name = new String [50];     //姓名  
+ public static String[] ID = new String [50];       //身份证号
+ public static double[] balance = new double [50];  //余额
+ public static int i = 0;   //用户人数
+ public static int j = 0;  //用户使用机号
+ public static boolean[] isID = new boolean [50];   //身份证是否使用
+
+}
+
+2、记录（Record）类
+package 网吧机房管理系统;
+import java.util.Scanner;
+public class Record {    //记录类
+ 
+ public void Register() {   //注册
+  int j = 0;
+  j = Computer.i + 1;
+
+  System.out.println("请输入姓名：");
+  Scanner input = new Scanner(System.in);
+     Computer.name[Computer.i] = input.next();
+     
+     System.out.println("请输入身份证号码：");
+     Computer.ID[Computer.i] = input.next();
+     
+     System.out.println("请输入充值金额(至少20元)：");
+     Computer.balance[Computer.i] = input.nextInt();
+     
+     while (Computer.balance[Computer.i] < 20) {
+      System.out.println("充值金额不够20元！");
+      System.out.println("请再次输入充值金额：");
+      Computer.balance[Computer.i] = input.nextInt();
+  }
+     
+     System.out.println("注册会员成功");
+     System.out.println("您的会员号为：" + j);
+     Computer.i++;
+
+ }
+  
+ //通过姓名查找其数组的下标
+ int nameSearch () {
+  System.out.println("请输入用户的姓名：");
+  Scanner input = new Scanner(System.in);
+  String name1 = input.next();
+     int x=-1;
+  for(int j = 0;j < Computer.i;j++) {  
+   
+   if(name1.equals(Computer.name[j])) {
+    x=j;
+   }
+   
+  }
+  return x;
+ }
+ 
+ //用户查询
+ int ShowMember(){  
+  int j;
+  j = nameSearch();
+  int i = j + 1;
+  if(j == -1) {
+   System.out.println("无效的会员姓名！");
+   return 0;
+  }
+  
+  System.out.println("姓名：" + Computer.name[j]);
+  System.out.println("会员号：" + i);
+  System.out.println("身份证号码：" + Computer.ID[j]);
+  System.out.println("余额：" + Computer.balance[j]);
+  
+  return 0;
+ }
+ 
+ //电脑信息查询
+ void ShowComputer() {   
+  int j = 0,count = 0;
+  for(int i = 0;i < 50;i++)
+   if(Computer.computer[i] != false) {
+    j = i + 1;
+    count++;
+    System.out.println(j + "号机");
+    }
+  
+  if(j != 0)
+  System.out.println("正在使用中...");
+  count = 50-count;
+  System.out.println("剩余"+ count +"台机");
+ }
+ 
+ //会员充值
+ int Add(){  
+  int j,count;
+  j = nameSearch();
+  if(j == -1) {
+   System.out.println("无效的会员姓名！");
+   return 0;
+  }
+  
+  System.out.println("请输入充值数额：");
+  Scanner input = new Scanner(System.in);
+     count = input.nextInt();
+     Computer.balance[j] += count;
+     
+     System.out.println("充值成功！，您的余额为："  + Computer.balance[j]);
+  
+     return 0;
+ } 
+ 
+}
+
+3、客户（User）类
+package 网吧机房管理系统;
+import java.util.Scanner;
+
+public class User {   //客户类
+
+ int money = 5;
+ public int logIn() {  //上机
+  int i;
+ Scanner input = new Scanner(System.in);
+ 
+ System.out.println(" 请输入您的身份证号码: ");
+ String Id;
+ 
+ Id = input.next();
+ i = idSearch(Id);
+ if(i == -1){
+  return 0;
+ }
+ 
+ if(Computer.isID[i] == true) {
+  System.out.println("您的身份证已在其他电脑登录！");
+  return 0;
+ }
+ Computer.isID[i] = true;
+ 
+ System.out.println(" 请输入您要上的电脑的机号(共50台机): ");
+ int num = input.nextInt();
+ 
+ Computer.j = num - 1;
+ Computer.computer[num - 1] = true;
+ 
+ System.out.println("上机成功！");
+ System.out.println("亲爱的超级无敌屌炸天会员用户 " + Computer.name[i]);
+ System.out.println("您当前余额为  " + Computer.balance[i]);
+
+ return 0;
+ }
+
+ //通过身份证号码查找其数组的下标
+  int idSearch(String id) {    
+   int x=-1,j;
+   for(j = 0;j < Computer.i;j++) 
+    {
+    if(id.equals(Computer.ID[j])) 
+      {
+     x = j;
+      }
+    }
+       
+   if(x == -1) 
+    System.out.println("无效的身份证号码！");   
+   return x;
+  }
+  
+  
+ public int checkout() {  //结账
+   int i;
+      System.out.println("请输入结账的身份证号码：");
+   Scanner input = new Scanner(System.in);
+   String id = input.next();
+   i = idSearch(id);
+   if(i == -1){
+    return 0;
+   }
+   
+   Computer.computer[Computer.j] = false;
+   Computer.isID[i] = false;
+   System.out.println("请输入上机时长：");
+   double hour = input.nextDouble();
+   Computer.balance[i] -= hour * money; 
+   
+            System.out.println("姓名：" + Computer.name[i]); 
+   System.out.println("该用户当前余额为" + Computer.balance[i]);
+   System.out.println("下机成功");
+   System.out.println("本次扣费" + hour * money);
+   
+   return 0;
+   
+ }
+
+}
+
+4、测试（Test）类
+package 网吧机房管理系统;
+import java.util.Scanner;
+
+public class Test {
+ 
+ public static void main(String[] args) {
+  
+  Scanner input = new Scanner(System.in);
+  boolean isExit = false;
+  int num = 0; // 用户输入0返回主菜单，否则退出系统
+  Record A = new Record();
+  User B = new User(); 
+  
+  System.out.println("***网吧机房管理系统***");
+  System.out.println("请输入管理员密码:");
+  
+  int password = input.nextInt();
+  while(password != 5438){   //密码是5438
+   System.out.println("密码有误，请重新输入密码：");
+   password = input.nextInt();
+  }
+  do{
+   System.out.println("********************");
+   System.out.println("**网吧机房管理系统**");
+   System.out.println("**1、注册功能**");
+   System.out.println("**2、上机功能**");
+   System.out.println("**3、结账功能**");
+   System.out.println("**4、查询功能**");
+   System.out.println("**5、充值功能**");
+   System.out.println("**6、退出系统**");
+   System.out.println("********************");
+   System.out.println("请选择：");
+   int choose = input.nextInt();
+   switch (choose) {
+   case 1:
+    //注册功能
+     A.Register(); 
+       
+    break;
+    
+         case 2:
+    //上机功能
+          B.logIn();
+          
+    break; 
+    
+         case 3:
+    //结账功能
+          B.checkout();
+        
+    break; 
+    
+         case 4:
+    //查询功能
+          System.out.println("********************");
+          System.out.println("**1、会员信息查询**");
+          System.out.println("**2、电脑信息查询**");
+          System.out.println("********************");
+          System.out.println("请选择：");
+
+          int choose1 = input.nextInt();
+          
+          switch (choose1) {
+          case 1:
+     //用户查询
+     A.ShowMember();              
+     break;
+     
+          case 2:
+     //电脑信息查询
+           A.ShowComputer();
+           
+     break;
+
+    default:
+     break;
+    }                
+    break; 
+    
+         case 5:
+          //充值功能
+          A.Add();
+          break; 
+          
+         case 6:
+          //退出系统
+          isExit = true;
+          num = -1;
+          break;
+          
+   default:
+    break;
+   }
+   if(!isExit){
+    System.out.println("输入0返回");
+    num = input.nextInt();
+   }
+   else {
+    break;
+   }
+
+  } while(num == 0);
+  System.out.println("谢谢使用，欢迎下次光临！");
+  
+ }
+
+}
